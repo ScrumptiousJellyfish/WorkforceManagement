@@ -1,0 +1,65 @@
+﻿@model IEnumerable<BangazonScrumptiousJellyfish.Models.Computer>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ComputerId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DatePurchased)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCommissioned)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Working)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModelName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Manufacturer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ComputerId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DatePurchased)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCommissioned)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Working)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModelName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
