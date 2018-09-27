@@ -62,7 +62,7 @@ namespace BangazonScrumptiousJellyfish.Models
             {
                 List<Department> department = (conn.Query<Department>(sql2)).ToList();
 
-                this.Computer = computer
+                this.Department = department
                     .Select(li => new SelectListItem
                     {
                         Text = li.DepartmentName,
