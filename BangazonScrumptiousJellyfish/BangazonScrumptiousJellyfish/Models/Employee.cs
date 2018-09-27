@@ -9,7 +9,7 @@ namespace BangazonScrumptiousJellyfish.Models
     public class Employee
     {
         
-        public int Id { get; set; }
+        public int EmployeeId { get; set; }
 
         [Required]
         [Display(Name = "First Name")]
@@ -20,10 +20,10 @@ namespace BangazonScrumptiousJellyfish.Models
         public string LastName { get; set; }
 
         [Required]
-        public bool IsSupervisor { get; set; }
+        public bool Supervisor { get; set; }
 
         [Required]
-        public bool IsActive { get; set; }
+        public string Email { get; set; }
 
         [Display(Name = "Employee Name")]
         public string FullName
