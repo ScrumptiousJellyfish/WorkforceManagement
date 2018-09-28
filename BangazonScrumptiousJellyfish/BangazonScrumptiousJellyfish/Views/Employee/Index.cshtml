@@ -1,0 +1,40 @@
+﻿@model IEnumerable<BangazonScrumptiousJellyfish.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var employee in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => employee.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => employee.Department.DepartmentName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@employee.EmployeeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@employee.EmployeeId">Details</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
