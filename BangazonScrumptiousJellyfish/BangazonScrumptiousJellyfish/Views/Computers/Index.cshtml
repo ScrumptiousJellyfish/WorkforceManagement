@@ -34,32 +34,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var computer in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ComputerId)
+                @Html.DisplayFor(modelItem => computer.ComputerId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DatePurchased)
+                @Html.DisplayFor(modelItem => computer.DatePurchased)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DateCommissioned)
+                @Html.DisplayFor(modelItem => computer.DateCommissioned)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Working)
+                @Html.DisplayFor(modelItem => computer.Working)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ModelName)
+                @Html.DisplayFor(modelItem => computer.ModelName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Manufacturer)
+                @Html.DisplayFor(modelItem => computer.Manufacturer)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
+                <a asp-action="Index" asp-route-id="@computer.ComputerId">Index</a> |
+                <a asp-action="Create" asp-route-id="@computer.ComputerId">Create</a> |
+                <a asp-action="Delete" asp-route-id="@computer.ComputerId">Delete</a>
+</tr>
 }
     </tbody>
 </table>

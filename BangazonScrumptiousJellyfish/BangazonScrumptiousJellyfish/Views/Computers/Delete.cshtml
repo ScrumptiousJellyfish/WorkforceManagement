@@ -48,8 +48,10 @@
             @Html.DisplayFor(model => model.Manufacturer)
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
+        <input type="hidden" asp-for="ComputerId" />
+        <a href="~/Views/Computers/Delete.cshtml">~/Views/Computers/Delete.cshtml</a>
         <input type="submit" value="Delete" class="btn btn-default" /> |
         <a asp-action="Index">Back to List</a>
     </form>

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
@@ -22,10 +25,73 @@ namespace BangazonScrumptiousJellyfish.Controllers
         }
 
         // GET: Employee/Create
-        public ActionResult Create()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Employee employee)
         {
-            return View();
+
+            if (ModelState.IsValid)
+            {
+                string sql = $@"
+                    INSERT INTO Employee
+                        ( FirstName, LastName, Email, Supervisor, DepartmentId )
+                        VALUES
+                        ( null
+                            , '{employee.FirstName}'
+                            , '{employee.LastName}'
+                            , '{employee.Email}'
+                            , '{employee.Supervisor}'
+                            , {employee.DepartmentId}
+                        )
+                    ";
+
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+
+            return View(employee);
         }
+
+
+        public async Task<IActionResult> DeleteConfirm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                select
+                    e.FirstName,
+                    e.LastName,
+                    e.Email,
+                    e.Supervisor,
+                    e.DepartmentId,
+                    e.Manufacturer
+                FROM employee e
+                WHERE e.EmployeeId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+
+                Employee employee = (await conn.QueryAsync<Employee>(sql)).ToList().Single();
+
+                if (employee == null)
+                {
+                    return BadRequest();
+                }
+
+                return View(employee);
+            }
+        }
+
 
         // POST: Employee/Create
         [HttpPost]
