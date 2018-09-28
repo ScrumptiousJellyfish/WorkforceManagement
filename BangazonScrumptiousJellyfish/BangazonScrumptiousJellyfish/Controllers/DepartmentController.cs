@@ -1,18 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class DepartmentController : Controller
     {
-        // GET: Department
-        public ActionResult Index()
+
+        private readonly IConfiguration _config;
+
+        public DepartmentController(IConfiguration config)
         {
-            return View();
+            _config = config;
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+
+        // GET: Department
+        public async Task<IActionResult> Index()
+        {
+            string sql = @"
+            SELECT
+                d.DepartmentId,
+                d.DepartmentName,
+                d.ExpenseBudget
+            FROM Department d;
+        ";
+
+            using (IDbConnection conn = Connection)
+            {
+                IEnumerable<Department> department = await conn.QueryAsync<Department>(sql);
+
+                return View(department);
+            }
         }
 
         // GET: Department/Details/5
