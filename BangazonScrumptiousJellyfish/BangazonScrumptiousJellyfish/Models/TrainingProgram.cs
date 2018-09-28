@@ -12,7 +12,7 @@ namespace BangazonScrumptiousJellyfish.Models
         public int TrainingProgramId { get; set; }
         [Required]
         [Display (Name = "Program Name")]
-        public string Name { get; set; }
+        public string ProgramName { get; set; }
         [Required]
         [Display (Name = "Start Date")]
         public DateTime StartDate { get; set; }
@@ -20,7 +20,7 @@ namespace BangazonScrumptiousJellyfish.Models
         [Display (Name = "End Date")]
         public DateTime EndDate { get; set; }
         [Required]
-        public int MaxAttendees { get; set; }
+        public int MaximumAttendees { get; set; }
         public List<Employee> Employees { get; set; }
     }
 }

@@ -1,18 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class TrainingProgramController : Controller
     {
-        // GET: TrainingProgram
-        public ActionResult Index()
+        private readonly IConfiguration _config;
+
+        public TrainingProgramController(IConfiguration config)
         {
-            return View();
+            _config = config;
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+        // GET: TrainingProgram
+        public async Task<IActionResult> Index()
+        {
+            string sql = @"select * from TrainingProgram 
+                           where StartDate > (select CAST(GETDATE() as DATE))
+                           ; ";
+            using (IDbConnection conn = Connection)
+            {
+                List<TrainingProgram> programs = new List<TrainingProgram>();
+                var programQuery = await conn.QueryAsync<TrainingProgram>(sql);
+                programs = programQuery.ToList();
+                return View(programs);
+            }
         }
 
         // GET: TrainingProgram/Details/5
