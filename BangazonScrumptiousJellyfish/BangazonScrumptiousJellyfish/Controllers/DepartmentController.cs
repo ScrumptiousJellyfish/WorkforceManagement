@@ -1,24 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class DepartmentController : Controller
     {
-        // GET: Department
-        public ActionResult Index()
+        private readonly IConfiguration _config;
+
+        public DepartmentController(IConfiguration config)
         {
-            return View();
+            _config = config;
         }
 
-        // GET: Department/Details/5
-        public ActionResult Details(int id)
+        public IDbConnection Connection
         {
-            return View();
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+
+        // GET: Department
+        public async Task<IActionResult> Index()
+        {
+            string sql = $@"select * from Department";
+            using (IDbConnection conn = Connection)
+            {
+                List<Department> departments = (await conn.QueryAsync<Department>(sql)).ToList();
+            return View(departments);
+            }
+        }
+
+
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+            select
+                d.DepartmentName,
+                d.ExpenseBudget
+            from Department d
+            WHERE d.DepartmentId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+
+                Department department = (await conn.QueryAsync<Department>(sql)).ToList().Single();
+
+                if (department == null)
+                {
+                    return NotFound();
+                }
+
+                return View(department);
+            }
         }
 
         // GET: Department/Create
