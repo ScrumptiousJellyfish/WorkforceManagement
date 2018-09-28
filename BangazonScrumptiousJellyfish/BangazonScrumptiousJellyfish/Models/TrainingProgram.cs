@@ -20,7 +20,7 @@ namespace BangazonScrumptiousJellyfish.Models
         [Display (Name = "End Date")]
         public DateTime EndDate { get; set; }
         [Required]
-        public int MaxAttendees { get; set; }
+        public int MaximumAttendees { get; set; }
         public List<Employee> Employees { get; set; }
     }
 }
