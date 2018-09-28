@@ -12,7 +12,7 @@ namespace BangazonScrumptiousJellyfish.Models
         public int TrainingProgramId { get; set; }
         [Required]
         [Display (Name = "Program Name")]
-        public string Name { get; set; }
+        public string ProgramName { get; set; }
         [Required]
         [Display (Name = "Start Date")]
         public DateTime StartDate { get; set; }
