@@ -1,24 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class EmployeeController : Controller
     {
-        // GET: Employee
-        public ActionResult Index()
+        private readonly IConfiguration _config;
+
+        public EmployeeController(IConfiguration config)
         {
-            return View();
+            _config = config;
         }
 
-        // GET: Employee/Details/5
-        public ActionResult Details(int id)
+        public IDbConnection Connection
         {
-            return View();
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+        // GET: Employee
+        public async Task<IActionResult> Index()
+        {
+            string sql = $@"select * from Employee";
+            using (IDbConnection conn = Connection)
+            {
+                List<Employee> employees = (await conn.QueryAsync<Employee>(sql)).ToList();
+                return View(employees);
+            }
+        }
+
+
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+            select 
+            e.FirstName, e.LastName, d.DepartmentName, c.ModelName, tp.ProgramName
+            from Employee e 
+            join Department d on e.DepartmentId = d.DepartmentId
+            join EmployeeComputer ec on ec.EmployeeId = e.EmployeeId
+            join Computer c on ec.ComputerId = c.ComputerId
+            join EmployeeTraining et on et.EmployeeId = e.EmployeeId
+            join TrainingProgram tp on et.TrainingProgramId = tp.TrainingProgramId
+            where e.EmployeeId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+
+                Employee employee = (await conn.QueryAsync<Employee>(sql)).ToList().Single();
+
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+
+                return View(employee);
+            }
         }
 
         // GET: Employee/Create
