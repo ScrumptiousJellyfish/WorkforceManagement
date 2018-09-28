@@ -206,6 +206,24 @@ VALUES(
 '2017/02/14', 
 '2017/03/01', 
 14);
+INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+VALUES(  
+ 'Learning .NET', 
+'2019/02/14', 
+'2019/03/01', 
+20);
+INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+VALUES(  
+ 'Starting Angular.js', 
+'2019/04/14', 
+'2019/07/01', 
+14);
+INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+VALUES(  
+ 'Learn Python', 
+'2020/02/14', 
+'2020/03/01', 
+14);
 INSERT INTO Department(DepartmentName,ExpenseBudget)
 VALUES( 
  'CodeRockstars', 
