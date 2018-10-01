@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonScrumptiousJellyfish.Models;
-using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Dapper;
+
 
 namespace BangazonScrumptiousJellyfish.Controllers
 
@@ -19,6 +23,60 @@ namespace BangazonScrumptiousJellyfish.Controllers
         private readonly IConfiguration _config;
 
         public EmployeeController(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+
+        public async Task<IActionResult> Index()
+        {
+            string sql = @"
+            select
+                e.EmployeeId,
+                e.FirstName,
+                e.LastName,
+                e.Email,
+                e.Supervisor,
+                d.DepartmentId,
+                d.DepartmentName
+            FROM Employee e
+            join Department d on e.DepartmentId = d.DepartmentId";
+
+            using (IDbConnection conn = Connection)
+            {
+                Dictionary<int, Employee> employees = new Dictionary<int, Employee>();
+
+                var employeeQuerySet = await conn.QueryAsync<Employee, Department, Employee>(
+                    sql,
+                    (employee, department) =>
+                    {
+                        if (!employees.ContainsKey(employee.EmployeeId))
+                        {
+                            employees[employee.EmployeeId] = employee;
+                        }
+                        employees[employee.EmployeeId].Department = department;
+                        return employee;
+                    }, splitOn:"DepartmentId");
+                return View(employees.Values);
+            }
+        }
+
+        // GET: Employee
+        //public ActionResult Index()
+        //{
+        //    return View();
+        //}
+
+        // GET: Employee/Details/5
+        public ActionResult Details(int id)
         {
             _config = config;
         }
@@ -173,5 +231,10 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     return View();
                 }
             }
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
