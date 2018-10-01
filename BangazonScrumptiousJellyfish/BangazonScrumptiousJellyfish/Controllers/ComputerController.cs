@@ -94,7 +94,6 @@ namespace BangazonScrumptiousJellyfish.Controllers
             return View(computer);
         }
 
-
         public async Task<IActionResult> DeleteConfirm(int? id)
         {
             if (id == null)
@@ -104,13 +103,13 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             string sql = $@"
                 select
-                    c.ComputerId,
-                    c.DatePurchased,
-                    c.DateDecommissioned,
-                    c.Working,
-                    c.ModelName,
-                    c.Manufacturer
-                FROM Computer c
+                    
+                c.DatePurchased,
+                c.DateDecommissioned,
+                c.Working,
+                c.ModelName,
+                c.Manufacturer
+                From Computer c
                 WHERE c.ComputerId = {id}";
 
             using (IDbConnection conn = Connection)
@@ -120,7 +119,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
                 if (computer == null)
                 {
-                    return BadRequest();
+                    return NotFound();
                 }
 
                 return View(computer);
@@ -129,10 +128,10 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
 
-            string sql = $@"DELETE FROM Computer WHERE ComputerId = {id}";
+            string sql = $@"DELETE FROM Instructor WHERE Id = {id}";
 
             using (IDbConnection conn = Connection)
             {
