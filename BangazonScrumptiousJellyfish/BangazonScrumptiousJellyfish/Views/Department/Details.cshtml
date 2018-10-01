@@ -22,6 +22,15 @@
         <dd>
             @Html.DisplayFor(model => model.ExpenseBudget)
         </dd>
+        @foreach (var item in Model.Employees)
+        {
+            <dt>
+                @Html.DisplayNameFor(modelItem => item.FullName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </dd>
+        }
     </dl>
 </div>
 <div>
