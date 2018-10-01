@@ -161,26 +161,89 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 return View();
             }
         }
-        //// GET: Employee/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
+
+        // GET: Employee/Edit/5
+        public async Task<ActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                SELECT
+                    e.EmployeeId,
+                    e.FirstName,
+                    e.LastName,
+                    e.Supervisor,
+                    e.Email,
+                    c.ComputerId,
+                    c.ModelName,
+                    d.DepartmentName,
+                    d.DepartmentId,
+                    ec.ComputerId,
+                    ec.EmployeeId
+                FROM Employee e
+                JOIN EmployeeComputer ec on ec.EmployeeId = e.EmployeeId
+                JOIN Computer c on ec.ComputerId = c.ComputerId
+                JOIN Department d on d.DepartmentId = e.DepartmentId
+                WHERE e.EmployeeId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                EmployeeEditViewModel model = new EmployeeEditViewModel(_config);
+
+                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, EmployeeComputer, Employee>(sql,
+                    (employee, computer, department, employeecomputer) =>
+                    {
+                        employee.Department = department;
+                        employee.Computer = computer;
+                        return employee;
+
+                    }, splitOn: "DepartmentId"
+                    )).Single();
+                return View(model);
+            }
+
+        }
         // POST: Employee/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, EmployeeEditViewModel model)
         {
-            try
+            if (id != model.Employee.EmployeeId)
             {
-                // TODO: Add update logic here
-                return RedirectToAction(nameof(Index));
+                
+                return NotFound();
             }
-            catch
+            if (ModelState.IsValid)
             {
-                return View();
+                string sql = $@"
+                UPDATE Employee
+                SET FirstName = '{model.Employee.FirstName}',
+                    LastName = '{model.Employee.LastName}',
+                    Computer = '{model.Employee.Computer}',
+                    DepartmentId = '{model.Employee.DepartmentId}'
+                WHERE EmployeeId = {id}";
+
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    throw new Exception("No rows affected");
+                }
+            }
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status406NotAcceptable);
             }
         }
+
+    
+
         // GET: Employee/Delete/5
         public ActionResult Delete(int id)
         {
