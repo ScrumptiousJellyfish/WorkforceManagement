@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<BangazonScrumptiousJellyfish.Models.Department>
 
+<<<<<<< HEAD
 @{
     ViewData["Title"] = "Index";
 }
@@ -45,3 +46,50 @@
 }
     </tbody>
 </table>
+=======
+    @{
+        ViewData["Title"] = "Department List";
+    }
+
+    <h2>@ViewData["Title"]</h2>
+
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.DepartmentId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DepartmentName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpenseBudget)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => department.DepartmentId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => department.DepartmentName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => department.ExpenseBudget)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@department.DepartmentId">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@department.DepartmentId">Edit</a> |
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+>>>>>>> master
