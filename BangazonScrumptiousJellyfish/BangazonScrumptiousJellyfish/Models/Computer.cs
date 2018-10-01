@@ -15,11 +15,11 @@ namespace BangazonScrumptiousJellyfish.Models
         public DateTime DatePurchased { get; set; }
 
 
-        [Required]
+    
         [Display(Name = "Date Decommissioned")]
         public DateTime DateDecommissioned { get; set; }
 
-        [Required]
+        
         public bool Working { get; set; }
 
         [Required]
