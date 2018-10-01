@@ -109,18 +109,14 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 c.Working,
                 c.ModelName,
                 c.Manufacturer
-                From Computer c
+                FROM Computer c
                 WHERE c.ComputerId = {id}";
 
             using (IDbConnection conn = Connection)
             {
+                Computer computer = await conn.QueryFirstAsync<Computer>(sql);
 
-                Computer computer = (await conn.QueryAsync<Computer>(sql)).ToList().Single();
-
-                if (computer == null)
-                {
-                    return NotFound();
-                }
+                if (computer == null) return NotFound();
 
                 return View(computer);
             }
@@ -131,7 +127,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
 
-            string sql = $@"DELETE FROM Instructor WHERE Id = {id}";
+            string sql = $@"DELETE FROM Computer WHERE ComputerId = {id}";
 
             using (IDbConnection conn = Connection)
             {
