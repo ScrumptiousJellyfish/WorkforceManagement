@@ -175,16 +175,11 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     e.EmployeeId,
                     e.FirstName,
                     e.LastName,
-                    e.Supervisor,
-                    e.Email,
                     c.ComputerId,
                     c.ModelName,
-                    d.DepartmentName,
                     d.DepartmentId,
-                    ec.ComputerId,
-                    ec.EmployeeId
+                    d.DepartmentName
                 FROM Employee e
-                JOIN EmployeeComputer ec on ec.EmployeeId = e.EmployeeId
                 JOIN Computer c on ec.ComputerId = c.ComputerId
                 JOIN Department d on d.DepartmentId = e.DepartmentId
                 WHERE e.EmployeeId = {id}";
@@ -193,15 +188,15 @@ namespace BangazonScrumptiousJellyfish.Controllers
             {
                 EmployeeEditViewModel model = new EmployeeEditViewModel(_config);
 
-                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, EmployeeComputer, Employee>(sql,
-                    (employee, computer, department, employeecomputer) =>
+                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, Employee>(sql,
+                    (employee, computer, department) =>
                     {
                         employee.Department = department;
                         employee.Computer = computer;
                         return employee;
 
-                    }, splitOn: "DepartmentId"
-                    )).Single();
+                    }, splitOn: "ComputerId, DepartmentId"
+                    )).Distinct().First();
                 return View(model);
             }
 
