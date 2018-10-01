@@ -63,21 +63,35 @@ namespace BangazonScrumptiousJellyfish.Controllers
         }
 
         // POST: Department/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create ([Bind("DepartmentId, DepartmentName, ExpenseBudget")] Department department)
         {
-            try
-            {
-                // TODO: Add insert logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            if (ModelState.IsValid)
             {
-                return View();
+                string sql = $@"
+                    INSERT INTO Department
+                        (DepartmentName, ExpenseBudget)
+                        VALUES
+                        ('{department.DepartmentName}', '{department.ExpenseBudget}') 
+                ";
+
+            using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
+            return View (department);
         }
+           
+        
 
         // GET: Department/Edit/5
         public ActionResult Edit(int id)
