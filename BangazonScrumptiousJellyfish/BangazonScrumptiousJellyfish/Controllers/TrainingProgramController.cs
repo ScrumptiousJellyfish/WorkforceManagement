@@ -59,18 +59,28 @@ namespace BangazonScrumptiousJellyfish.Controllers
         // POST: TrainingProgram/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create([Bind ("TrainingProgramId, ProgramName, StartDate, EndDate, MaximumAttendees")] TrainingProgram trainingprogram)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                string sql = $@"
+                    INSERT INTO TrainingProgram
+                        (ProgramName, StartDate, EndDate, MaximumAttendees)
+                        VALUES
+                        ('{trainingprogram.ProgramName}', '{trainingprogram.StartDate}', '{trainingprogram.EndDate}', '{trainingprogram.MaximumAttendees}') 
+                ";
 
-                return RedirectToAction(nameof(Index));
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View(trainingprogram);
         }
 
         // GET: TrainingProgram/Edit/5
