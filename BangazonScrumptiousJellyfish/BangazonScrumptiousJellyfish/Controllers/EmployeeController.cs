@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonScrumptiousJellyfish.Models;
-using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Dapper;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
@@ -29,19 +30,41 @@ namespace BangazonScrumptiousJellyfish.Controllers
             }
         }
 
-        // GET: Employee
+
         public async Task<IActionResult> Index()
         {
-            string sql = $@"select * from Employee";
+            string sql = @"
+            select
+                e.EmployeeId,
+                e.FirstName,
+                e.LastName,
+                e.Email,
+                e.Supervisor,
+                d.DepartmentId,
+                d.DepartmentName
+            FROM Employee e
+            join Department d on e.DepartmentId = d.DepartmentId";
+
             using (IDbConnection conn = Connection)
             {
-                List<Employee> employees = (await conn.QueryAsync<Employee>(sql)).ToList();
-                return View(employees);
+                Dictionary<int, Employee> employees = new Dictionary<int, Employee>();
+
+                var employeeQuerySet = await conn.QueryAsync<Employee, Department, Employee>(
+                    sql,
+                    (employee, department) =>
+                    {
+                        if (!employees.ContainsKey(employee.EmployeeId))
+                        {
+                            employees[employee.EmployeeId] = employee;
+                        }
+                        employees[employee.EmployeeId].Department = department;
+                        return employee;
+                    }, splitOn:"DepartmentId");
+                return View(employees.Values);
             }
         }
 
-
-
+        // GET: Employee/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -51,7 +74,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             string sql = $@"
             select 
-            e.FirstName, e.LastName, d.DepartmentName, c.ModelName, tp.ProgramName
+            e.EmployeeId, e.FirstName, e.LastName, d.DepartmentId, d.DepartmentName, c.ComputerId, c.ModelName, tp.TrainingProgramId, tp.ProgramName
             from Employee e 
             join Department d on e.DepartmentId = d.DepartmentId
             join EmployeeComputer ec on ec.EmployeeId = e.EmployeeId
@@ -62,15 +85,25 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             using (IDbConnection conn = Connection)
             {
+                Dictionary<int, Employee> employeeDictionary = new Dictionary<int, Employee>();
 
-                Employee employee = (await conn.QueryAsync<Employee>(sql)).ToList().Single();
+                var list = conn.Query<Employee, Department, Computer, TrainingProgram, Employee>(sql, (employ, department, computer, trainingProgram) => {
+                    Employee emp;
+                    if (!employeeDictionary.TryGetValue(employ.EmployeeId, out emp))
+                    {
+                        emp = employ;
+                        emp.Department = department;
+                        emp.Computer = computer;
+                        emp.TrainingPrograms = new List<TrainingProgram>();
+                        employeeDictionary.Add(emp.EmployeeId, emp);
+                    }
 
-                if (employee == null)
-                {
-                    return NotFound();
-                }
+                    emp.TrainingPrograms.Add(trainingProgram);
+                    return emp;
+                }, splitOn: "EmployeeId,DepartmentId,ComputerId,TrainingProgramId").Distinct().First();
+                
 
-                return View(employee);
+                return View(list);
             }
         }
 
@@ -141,6 +174,11 @@ namespace BangazonScrumptiousJellyfish.Controllers
             {
                 return View();
             }
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

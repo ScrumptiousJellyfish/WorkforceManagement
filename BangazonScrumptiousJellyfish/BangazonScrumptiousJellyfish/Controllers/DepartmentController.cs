@@ -1,18 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class DepartmentController : Controller
     {
-        // GET: Department
-        public ActionResult Index()
+
+        private readonly IConfiguration _config;
+
+        public DepartmentController(IConfiguration config)
         {
-            return View();
+            _config = config;
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+
+        // GET: Department
+        public async Task<IActionResult> Index()
+        {
+            string sql = @"
+            SELECT
+                d.DepartmentId,
+                d.DepartmentName,
+                d.ExpenseBudget
+            FROM Department d;
+        ";
+
+            using (IDbConnection conn = Connection)
+            {
+                IEnumerable<Department> department = await conn.QueryAsync<Department>(sql);
+
+                return View(department);
+            }
         }
 
         // GET: Department/Details/5
@@ -28,21 +63,35 @@ namespace BangazonScrumptiousJellyfish.Controllers
         }
 
         // POST: Department/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create ([Bind("DepartmentId, DepartmentName, ExpenseBudget")] Department department)
         {
-            try
-            {
-                // TODO: Add insert logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            if (ModelState.IsValid)
             {
-                return View();
+                string sql = $@"
+                    INSERT INTO Department
+                        (DepartmentName, ExpenseBudget)
+                        VALUES
+                        ('{department.DepartmentName}', '{department.ExpenseBudget}') 
+                ";
+
+            using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
+            return View (department);
         }
+           
+        
 
         // GET: Department/Edit/5
         public ActionResult Edit(int id)
