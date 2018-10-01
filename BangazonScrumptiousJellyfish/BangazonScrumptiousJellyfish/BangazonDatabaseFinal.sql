@@ -91,6 +91,7 @@ CREATE TABLE Computer (
 CREATE TABLE TrainingProgram (
   TrainingProgramId   INTEGER NOT NULL PRIMARY KEY IDENTITY,
   ProgramName         varchar(80) NOT NULL,
+  Descrip		  varchar(90) NOT NULL,	
   StartDate           DATE NOT NULL,
   EndDate             DATE NOT NULL,
   MaximumAttendees    INTEGER NOT NULL
@@ -191,36 +192,41 @@ INSERT INTO Computer(DatePurchased, DateDecommissioned, Working, ModelName, Manu
 VALUES( 
  '2016/04/01', 
 '2017/04/15', 
-0,
+1,
 'ThinkPad',
 'Lenovo');
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate,MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate,MaximumAttendees)
 VALUES( 
- 'Learn To Type', 
+ 'Learn To Type',
+ 'Learn How to type', 
 '2018/09/20', 
 '2018/09/27', 
 23);
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
- 'Begining React', 
+ 'Begining React',
+ 'Learn React in a month', 
 '2017/02/14', 
 '2017/03/01', 
 14);
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
  'Learning .NET', 
+ 'Learn .NET in 3 months',
 '2019/02/14', 
 '2019/03/01', 
 20);
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
  'Starting Angular.js', 
+ 'Learn Angular really quickly!',
 '2019/04/14', 
 '2019/07/01', 
 14);
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
  'Learn Python', 
+ 'Python is really useful',
 '2020/02/14', 
 '2020/03/01', 
 14);
@@ -347,12 +353,13 @@ INSERT INTO Computer(DatePurchased, DateDecommissioned, Working, ModelName, Manu
 VALUES( 
  '2018/12/11', 
  null,
-3,
+1,
 'Pro',
 'Mac');
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
  'Mastering SQL', 
+ 'Master SQL with this training program',
 '2018/07/12', 
 '2018/07/13', 
 5);
