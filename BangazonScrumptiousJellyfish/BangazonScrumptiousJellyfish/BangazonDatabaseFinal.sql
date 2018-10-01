@@ -224,6 +224,12 @@ VALUES(
 '2020/02/14', 
 '2020/03/01', 
 14);
+INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+VALUES(  
+ 'Learn CSS', 
+'2021/02/14', 
+'2021/03/01', 
+35);
 INSERT INTO Department(DepartmentName,ExpenseBudget)
 VALUES( 
  'CodeRockstars', 
@@ -246,13 +252,36 @@ VALUES(
 'rleedy@gmail.com',
 0,
 2);
-INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+INSERT INTO Employee(FirstName,LastName,Email,Supervisor,DepartmentId)
 VALUES(  
-1,
+ 'Seth', 
+ 'Dana', 
+'sdana@gmail.com',
+0,
 2);
 INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
 VALUES(  
-2,
+4,
+1);
+INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+VALUES(  
+5,
+3);
+INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+VALUES(  
+6,
+3);
+INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+VALUES(  
+4,
+3);
+INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+VALUES(  
+5,
+2);
+INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+VALUES(  
+6,
 1);
 INSERT INTO EmployeeComputer(DateAssigned,DateReturned,EmployeeId,ComputerId)
 VALUES( 

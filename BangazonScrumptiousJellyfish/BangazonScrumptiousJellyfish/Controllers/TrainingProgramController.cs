@@ -45,9 +45,36 @@ namespace BangazonScrumptiousJellyfish.Controllers
         }
 
         // GET: TrainingProgram/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            string sql = $@"SELECT tp.*, e.*
+                            FROM TrainingProgram tp
+                            JOIN EmployeeTraining et ON et.TrainingProgramId = tp.TrainingProgramId
+                            JOIN Employee e ON e.EmployeeId = et.EmployeeId
+                            WHERE tp.TrainingProgramId = {id}";
+            Dictionary<int, TrainingProgram> programs = new Dictionary<int, TrainingProgram>();
+            using (IDbConnection conn = Connection)
+            {
+                TrainingProgram programInstance = new TrainingProgram();
+                List<Employee> employeeList = new List<Employee>();
+                var newQuery = await conn.QueryAsync<TrainingProgram, Employee, TrainingProgram>(sql,
+                    (program, employee) =>
+                    {
+                        programInstance = program;
+                        employeeList.Add(employee);
+
+                        
+                        return program;
+                    },
+                    splitOn: "employeeId"
+                    );
+                programInstance.Employees = employeeList;
+                return View(programInstance);
+            }
         }
 
         // GET: TrainingProgram/Create
