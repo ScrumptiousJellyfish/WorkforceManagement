@@ -9,7 +9,11 @@ namespace BangazonScrumptiousJellyfish.Models
         public int DepartmentId { get; set; }
 
         [Required]
+        [Display(Name = "Department Name")]
         public string DepartmentName { get; set; }
+
+        [Required]
+        [Display(Name = "Expense Budget")]
         public int ExpenseBudget { get; set; }
 
         public List<Employee> Employees { get; set; } = new List<Employee>();
