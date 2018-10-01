@@ -1,11 +1,10 @@
 ﻿@model IEnumerable<BangazonScrumptiousJellyfish.Models.Department>
 
-<<<<<<< HEAD
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Department List";
 }
 
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -26,70 +25,23 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DepartmentId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DepartmentName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExpenseBudget)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                <a asp-action="Details" asp-route-id="@item.DepartmentId">Details</a> |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
+        @foreach (var department in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => department.DepartmentId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => department.DepartmentName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => department.ExpenseBudget)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@department.DepartmentId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@department.DepartmentId">Edit</a> |
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-=======
-    @{
-        ViewData["Title"] = "Department List";
-    }
-
-    <h2>@ViewData["Title"]</h2>
-
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.DepartmentId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.DepartmentName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ExpenseBudget)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var department in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => department.DepartmentId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => department.DepartmentName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => department.ExpenseBudget)
-                    </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@department.DepartmentId">Details</a> |
-                        <a asp-action="Edit" asp-route-id="@department.DepartmentId">Edit</a> |
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
->>>>>>> master
