@@ -1,93 +1,153 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonScrumptiousJellyfish.Models;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class ComputerController : Controller
     {
-        // GET: Computer
-        public ActionResult Index()
+        private readonly IConfiguration _config;
+
+        public ComputerController(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+        public async Task<IActionResult> Index()
+        {
+
+            string sql = @"
+            select
+                c.ComputerId,
+                c.DatePurchased,
+                c.DateDecommissioned,
+                c.Working,
+                c.ModelName,
+                c.Manufacturer
+             
+        
+            from Computer c
+    
+        ";
+
+            using (IDbConnection conn = Connection)
+            {
+                IEnumerable<Computer> computer = await conn.QueryAsync<Computer>(sql);
+
+                return View(computer);
+
+            }
+        }
+        public ActionResult Create(int id)
         {
             return View();
         }
-
-        // GET: Computer/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Computer/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Computer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Computer computer)
         {
-            try
-            {
-                // TODO: Add insert logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            if (ModelState.IsValid)
             {
-                return View();
+                string sql = $@"
+                    INSERT INTO Computer
+                        ( DatePurchased, DateDecommissioned, Working, ModelName, Manufacturer )
+                        VALUES
+                        ( 
+                             '{computer.DatePurchased}'
+                            , '{computer.DateDecommissioned}'
+                            , '{computer.Working}'
+                            , '{computer.ModelName}'
+                            , '{computer.Manufacturer}'
+                        )
+                    ";
+
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+
+            return View(computer);
+        }
+
+        public async Task<IActionResult> DeleteConfirm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                select
+                    
+                c.DatePurchased,
+                c.DateDecommissioned,
+                c.Working,
+                c.ModelName,
+                c.Manufacturer
+                From Computer c
+                WHERE c.ComputerId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+
+                Computer computer = (await conn.QueryAsync<Computer>(sql)).ToList().Single();
+
+                if (computer == null)
+                {
+                    return NotFound();
+                }
+
+                return View(computer);
             }
         }
 
-        // GET: Computer/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Computer/Edit/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            try
-            {
-                // TODO: Add update logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            string sql = $@"DELETE FROM Instructor WHERE Id = {id}";
+
+            using (IDbConnection conn = Connection)
             {
-                return View();
+                int rowsAffected = await conn.ExecuteAsync(sql);
+                if (rowsAffected > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                throw new Exception("No rows affected");
             }
         }
 
-        // GET: Computer/Delete/5
-        public ActionResult Delete(int id)
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
         {
-            return View();
-        }
-
-        // POST: Computer/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
