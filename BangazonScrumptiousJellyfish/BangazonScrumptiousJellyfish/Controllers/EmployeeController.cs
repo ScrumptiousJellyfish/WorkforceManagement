@@ -11,19 +11,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Dapper;
-
 namespace BangazonScrumptiousJellyfish.Controllers
-
 {
     public class EmployeeController : Controller
     {
         private readonly IConfiguration _config;
-
         public EmployeeController(IConfiguration config)
         {
             _config = config;
         }
-
         public IDbConnection Connection
         {
             get
@@ -31,8 +27,6 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-
-
         public async Task<IActionResult> Index()
         {
             string sql = @"
@@ -46,11 +40,9 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 d.DepartmentName
             FROM Employee e
             join Department d on e.DepartmentId = d.DepartmentId";
-
             using (IDbConnection conn = Connection)
             {
                 Dictionary<int, Employee> employees = new Dictionary<int, Employee>();
-
                 var employeeQuerySet = await conn.QueryAsync<Employee, Department, Employee>(
                     sql,
                     (employee, department) =>
@@ -61,23 +53,20 @@ namespace BangazonScrumptiousJellyfish.Controllers
                         }
                         employees[employee.EmployeeId].Department = department;
                         return employee;
-                    }, splitOn:"DepartmentId");
+                    }, splitOn: "DepartmentId");
                 return View(employees.Values);
             }
         }
-
-        // GET: Employee
+        //GET: Employee
         //public ActionResult Index()
         //{
         //    return View();
         //}
-
         // GET: Employee/Details/5
         //public ActionResult Details(int id)
         //{
         //    _config = config;
         //}
-
         //public IDbConnection Connection
         //{
         //    get
@@ -85,33 +74,29 @@ namespace BangazonScrumptiousJellyfish.Controllers
         //        return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
         //    }
         //}
-        //// GET: Employee
+        // GET: Employee
         //public ActionResult Index()
         //    {
         //        return View();
         //    }
-
-            // GET: Employee/Details/5
-            public ActionResult Details(int id)
-            {
-                return View();
-            }
-
-        //GET: EmployeeCreate
+        // GET: Employee/Details/5
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
+        // GET: Employee/Create
         public ActionResult Create(int id)
         {
             return View();
         }
-
-        // Post: Employee/Create
+        // GET: Employee/Create
         [HttpPost]
-            [ValidateAntiForgeryToken]
-            public async Task<IActionResult> Create(Employee employee)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Employee employee)
+        {
+            if (ModelState.IsValid)
             {
-
-                if (ModelState.IsValid)
-                {
-                    string sql = $@"
+                string sql = $@"
                     INSERT INTO Employee
                         ( FirstName, LastName, Email, Supervisor, DepartmentId )
                         VALUES
@@ -123,30 +108,24 @@ namespace BangazonScrumptiousJellyfish.Controllers
                             , {employee.DepartmentId}
                         )
                     ";
-
-                    using (IDbConnection conn = Connection)
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+                    if (rowsAffected > 0)
                     {
-                        int rowsAffected = await conn.ExecuteAsync(sql);
-
-                        if (rowsAffected > 0)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-
-                return View(employee);
             }
-
-
-            public async Task<IActionResult> DeleteConfirm(int? id)
+            return View(employee);
+        }
+        public async Task<IActionResult> DeleteConfirm(int? id)
+        {
+            if (id == null)
             {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-
-                string sql = $@"
+                return NotFound();
+            }
+            string sql = $@"
                 select
                     e.FirstName,
                     e.LastName,
@@ -156,88 +135,76 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     e.Manufacturer
                 FROM employee e
                 WHERE e.EmployeeId = {id}";
-
-                using (IDbConnection conn = Connection)
-                {
-
-                    Employee employee = (await conn.QueryAsync<Employee>(sql)).ToList().Single();
-
-                    if (employee == null)
-                    {
-                        return BadRequest();
-                    }
-
-                    return View(employee);
-                }
-            }
-
-
-            // POST: Employee/Create
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public ActionResult Create(IFormCollection collection)
+            using (IDbConnection conn = Connection)
             {
-                try
+                Employee employee = (await conn.QueryAsync<Employee>(sql)).ToList().Single();
+                if (employee == null)
                 {
-                    // TODO: Add insert logic here
-
-                    return RedirectToAction(nameof(Index));
+                    return BadRequest();
                 }
-                catch
-                {
-                    return View();
-                }
+                return View(employee);
             }
-
-            // GET: Employee/Edit/5
-            public ActionResult Edit(int id)
+        }
+      
+        // POST: Employee/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(IFormCollection collection)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+                return RedirectToAction(nameof(Index));
+            }
+            catch
             {
                 return View();
             }
-
-            // POST: Employee/Edit/5
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public ActionResult Edit(int id, IFormCollection collection)
+        }
+        //// GET: Employee/Edit/5
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
+        // POST: Employee/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, IFormCollection collection)
+        {
+            try
             {
-                try
-                {
-                    // TODO: Add update logic here
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch
-                {
-                    return View();
-                }
+                // TODO: Add update logic here
+                return RedirectToAction(nameof(Index));
             }
-
-            // GET: Employee/Delete/5
-            public ActionResult Delete(int id)
+            catch
             {
                 return View();
             }
-
-            // POST: Employee/Delete/5
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public ActionResult Delete(int id, IFormCollection collection)
+        }
+        // GET: Employee/Delete/5
+        public ActionResult Delete(int id)
+        {
+            return View();
+        }
+        // POST: Employee/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, IFormCollection collection)
+        {
+            try
             {
-                try
-                {
-                    // TODO: Add delete logic here
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch
-                {
-                    return View();
-                }
+                // TODO: Add delete logic here
+                return RedirectToAction(nameof(Index));
             }
+            catch
+            {
+                return View();
+            }
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        }
     }
+}
