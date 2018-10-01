@@ -26,14 +26,14 @@ namespace BangazonScrumptiousJellyfish.Models
         [Required]
         public string Email { get; set; }
 
-        [Display(Name = "Employee Name")]
-        public string FullName
-        {
-            get
-            {
-                return $"{FirstName} {LastName}";
-            }
-        }
+        //[Display(Name = "Employee Name")]
+        //public string FullName
+        //{
+        //    get
+        //    {
+        //        return $"{FirstName} {LastName}";
+        //    }
+        //}
 
         public int DepartmentId { get; set; }
 

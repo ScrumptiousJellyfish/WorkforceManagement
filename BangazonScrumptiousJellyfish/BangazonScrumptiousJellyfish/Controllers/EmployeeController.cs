@@ -98,14 +98,12 @@ namespace BangazonScrumptiousJellyfish.Controllers
             {
                 string sql = $@"
                     INSERT INTO Employee
-                        ( FirstName, LastName, Email, Supervisor, DepartmentId )
+                        ( FirstName, LastName, Email, Supervisor )
                         VALUES
-                        ( null
-                            , '{employee.FirstName}'
+                        (  '{employee.FirstName}'
                             , '{employee.LastName}'
                             , '{employee.Email}'
                             , '{employee.Supervisor}'
-                            , {employee.DepartmentId}
                         )
                     ";
                 using (IDbConnection conn = Connection)
@@ -146,21 +144,21 @@ namespace BangazonScrumptiousJellyfish.Controllers
             }
         }
       
-        // POST: Employee/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// POST: Employee/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Create(IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        // TODO: Add insert logic here
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
         //// GET: Employee/Edit/5
         //public ActionResult Edit(int id)
         //{
