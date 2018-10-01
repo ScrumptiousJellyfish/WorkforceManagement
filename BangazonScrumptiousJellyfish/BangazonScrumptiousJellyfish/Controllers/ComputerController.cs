@@ -56,7 +56,10 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             }
         }
-
+        public ActionResult Create(int id)
+        {
+            return View();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Computer computer)
