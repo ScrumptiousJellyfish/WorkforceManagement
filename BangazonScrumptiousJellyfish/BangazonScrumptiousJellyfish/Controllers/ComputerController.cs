@@ -71,12 +71,12 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     INSERT INTO Computer
                         ( DatePurchased, DateDecommissioned, Working, ModelName, Manufacturer )
                         VALUES
-                        ( null
-                            , '{computer.DatePurchased}'
+                        ( 
+                             '{computer.DatePurchased}'
                             , '{computer.DateDecommissioned}'
                             , '{computer.Working}'
                             , '{computer.ModelName}'
-                            , {computer.Manufacturer}
+                            , '{computer.Manufacturer}'
                         )
                     ";
 
