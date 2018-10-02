@@ -57,32 +57,48 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 return View(employees.Values);
             }
         }
-        //GET: Employee
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
         // GET: Employee/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    _config = config;
-        //}
-        //public IDbConnection Connection
-        //{
-        //    get
-        //    {
-        //        return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-        //    }
-        //}
-        // GET: Employee
-        //public ActionResult Index()
-        //    {
-        //        return View();
-        //    }
-        // GET: Employee/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Details(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+            select 
+            e.EmployeeId, e.FirstName, e.LastName, d.DepartmentId, d.DepartmentName, c.ComputerId, c.ModelName, tp.TrainingProgramId, tp.ProgramName
+            from Employee e 
+            join Department d on e.DepartmentId = d.DepartmentId
+            join EmployeeComputer ec on ec.EmployeeId = e.EmployeeId
+            join Computer c on ec.ComputerId = c.ComputerId
+            join EmployeeTraining et on et.EmployeeId = e.EmployeeId
+            join TrainingProgram tp on et.TrainingProgramId = tp.TrainingProgramId
+            where e.EmployeeId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                Dictionary<int, Employee> employeeDictionary = new Dictionary<int, Employee>();
+
+                var list = conn.Query<Employee, Department, Computer, TrainingProgram, Employee>(sql, (employ, department, computer, trainingProgram) =>
+                {
+                    Employee emp;
+                    if (!employeeDictionary.TryGetValue(employ.EmployeeId, out emp))
+                    {
+                        emp = employ;
+                        emp.Department = department;
+                        emp.Computer = computer;
+                        emp.TrainingPrograms = new List<TrainingProgram>();
+                        employeeDictionary.Add(emp.EmployeeId, emp);
+                    }
+
+                    emp.TrainingPrograms.Add(trainingProgram);
+                    return emp;
+                }, splitOn: "EmployeeId,DepartmentId,ComputerId,TrainingProgramId").Distinct().First();
+
+
+                return View(list);
+            }
         }
         // GET: Employee/Create
         public ActionResult Create(int id)
