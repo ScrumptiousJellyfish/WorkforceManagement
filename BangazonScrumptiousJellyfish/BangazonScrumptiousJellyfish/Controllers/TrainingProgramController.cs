@@ -111,26 +111,62 @@ namespace BangazonScrumptiousJellyfish.Controllers
         }
 
         // GET: TrainingProgram/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            string sql = $@"
+                SELECT tp.*
+                FROM TrainingProgram tp
+                WHERE TrainingProgramId = {id}
+            ";
+            
+            using (IDbConnection conn = Connection)
+            {
+                TrainingProgram instance = new TrainingProgram();
+                instance = (await conn.QueryAsync<TrainingProgram>(sql)).Single();
+                return View(instance);
+            }
+                
         }
 
         // POST: TrainingProgram/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(int? id, TrainingProgram program)
         {
-            try
+            if(id == null)
             {
-                // TODO: Add update logic here
+                return NotFound();
+            }
+            if (ModelState.IsValid)
+            {
+                string sql = $@"
+            UPDATE TrainingProgram
+            SET ProgramName = '{program.ProgramName}',
+                Descrip = '{program.Descrip}',
+                StartDate = '{program.StartDate}',
+                EndDate = '{program.EndDate}',
+                MaximumAttendees = '{program.MaximumAttendees}'
+                WHERE TrainingProgramId = {id}
+            ";
+                using (IDbConnection conn = Connection)
+                {
+                    int rowsAffected = await conn.ExecuteAsync(sql);
+                    if (rowsAffected > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    throw new Exception("No Rows Affected");
+                }
+            } else
+            {
+                return new StatusCodeResult(StatusCodes.Status406NotAcceptable);
+            }
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
         }
 
         // GET: TrainingProgram/Delete/5
