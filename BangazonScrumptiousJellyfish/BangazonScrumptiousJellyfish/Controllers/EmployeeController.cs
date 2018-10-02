@@ -178,10 +178,14 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     c.ComputerId,
                     c.ModelName,
                     d.DepartmentId,
-                    d.DepartmentName
+                    d.DepartmentName,
+                    ec.EmployeeComputerId,
+                    ec.EmployeeId,
+                    ec.ComputerId
                 FROM Employee e
-                JOIN Computer c on ec.ComputerId = c.ComputerId
                 JOIN Department d on d.DepartmentId = e.DepartmentId
+                JOIN EmployeeComputer ec on e.EmployeeId = ec.EmployeeId
+                JOIN Computer c on ec.ComputerId = c.ComputerId
                 WHERE e.EmployeeId = {id}";
 
             using (IDbConnection conn = Connection)
@@ -217,9 +221,12 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 UPDATE Employee
                 SET FirstName = '{model.Employee.FirstName}',
                     LastName = '{model.Employee.LastName}',
-                    Computer = '{model.Employee.Computer}',
                     DepartmentId = '{model.Employee.DepartmentId}'
-                WHERE EmployeeId = {id}";
+                WHERE EmployeeId = {id};
+
+                UPDATE EmployeeComputer
+				SET ComputerId = '{model.Employee.Computer}'
+				WHERE EmployeeId = {id}";
 
                 using (IDbConnection conn = Connection)
                 {
