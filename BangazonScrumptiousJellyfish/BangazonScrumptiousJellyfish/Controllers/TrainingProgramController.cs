@@ -86,15 +86,15 @@ namespace BangazonScrumptiousJellyfish.Controllers
         // POST: TrainingProgram/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind ("TrainingProgramId, ProgramName, StartDate, EndDate, MaximumAttendees")] TrainingProgram trainingprogram)
+        public async Task<IActionResult> Create([Bind ("TrainingProgramId, ProgramName, Descrip, StartDate, EndDate, MaximumAttendees")] TrainingProgram trainingprogram)
         {
             if (ModelState.IsValid)
             {
                 string sql = $@"
                     INSERT INTO TrainingProgram
-                        (ProgramName, StartDate, EndDate, MaximumAttendees)
+                        (ProgramName, Descrip, StartDate, EndDate, MaximumAttendees)
                         VALUES
-                        ('{trainingprogram.ProgramName}', '{trainingprogram.StartDate}', '{trainingprogram.EndDate}', '{trainingprogram.MaximumAttendees}') 
+                        ('{trainingprogram.ProgramName}', '{trainingprogram.Descrip}', '{trainingprogram.StartDate}', '{trainingprogram.EndDate}', '{trainingprogram.MaximumAttendees}') 
                 ";
 
                 using (IDbConnection conn = Connection)

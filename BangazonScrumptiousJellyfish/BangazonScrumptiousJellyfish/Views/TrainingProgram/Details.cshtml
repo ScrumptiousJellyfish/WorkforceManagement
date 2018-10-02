@@ -17,6 +17,12 @@
             @Html.DisplayFor(model => model.ProgramName)
         </dd>
         <dt>
+            @Html.DisplayNameFor(model => model.Descrip)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Descrip)
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
         <dd>
@@ -37,7 +43,7 @@
         <dt>
             @Html.DisplayNameFor(model => model.Employees)
         </dt>
-        @foreach(var item in Model.Employees)
+        @foreach (var item in Model.Employees)
         {
             <dd>
                 @Html.DisplayFor(modelItem => item.FullName)
