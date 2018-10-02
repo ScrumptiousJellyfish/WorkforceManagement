@@ -114,12 +114,13 @@ namespace BangazonScrumptiousJellyfish.Controllers
             {
                 string sql = $@"
                     INSERT INTO Employee
-                        ( FirstName, LastName, Email, Supervisor )
+                        ( FirstName, LastName, Email, Supervisor, DepartmentId )
                         VALUES
                         (  '{employee.FirstName}'
                             , '{employee.LastName}'
                             , '{employee.Email}'
                             , '{employee.Supervisor}'
+                            ,'{employee.DepartmentId}'
                         )
                     ";
                 using (IDbConnection conn = Connection)

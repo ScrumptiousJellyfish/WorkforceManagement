@@ -103,7 +103,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             string sql = $@"
                 select
-                    
+                c.ComputerId,   
                 c.DatePurchased,
                 c.DateDecommissioned,
                 c.Working,
@@ -124,11 +124,14 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-
-            string sql = $@"DELETE FROM Computer WHERE ComputerId = {id}";
-            string sql2 = $@"DELETE FROM EmployeeComputer WHERE ComputerId = {id}";
+            if ( id == null)
+            {
+                return NotFound();
+            }
+            string sql = $@"DELETE FROM EmployeeComputer WHERE ComputerId = {id};
+                            DELETE FROM Computer WHERE ComputerId = {id}";
 
 
 
@@ -140,8 +143,13 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 throw new Exception("No rows affected");
+            
+            
+            
+            
             }
         }
+               
 
         }
     }
