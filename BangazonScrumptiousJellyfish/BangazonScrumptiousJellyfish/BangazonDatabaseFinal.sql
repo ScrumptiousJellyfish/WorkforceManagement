@@ -230,9 +230,10 @@ VALUES(
 '2020/02/14', 
 '2020/03/01', 
 14);
-INSERT INTO TrainingProgram(ProgramName,StartDate,EndDate, MaximumAttendees)
+INSERT INTO TrainingProgram(ProgramName,Descrip,StartDate,EndDate, MaximumAttendees)
 VALUES(  
- 'Learn CSS', 
+ 'Learn CSS',
+ 'Style with CSS',   
 '2021/02/14', 
 '2021/03/01', 
 35);
