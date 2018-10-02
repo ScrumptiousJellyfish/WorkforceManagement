@@ -40,5 +40,7 @@ namespace BangazonScrumptiousJellyfish.Models
         public Department Department { get; set; }
 
         public Computer Computer { get; set; }
+
+        public List<TrainingProgram> TrainingPrograms { get; set; }
     }
 }

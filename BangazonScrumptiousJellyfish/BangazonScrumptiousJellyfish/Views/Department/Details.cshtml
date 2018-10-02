@@ -1,0 +1,27 @@
+﻿@model BangazonScrumptiousJellyfish.Models.Department
+
+<div>
+    <h2>@Html.DisplayFor(model => model.DepartmentName)</h2>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartmentName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DepartmentName)
+        </dd>
+        @foreach (var item in Model.Employees)
+        {
+            <dt>
+                @Html.DisplayNameFor(modelItem => item.FullName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </dd>
+        }
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

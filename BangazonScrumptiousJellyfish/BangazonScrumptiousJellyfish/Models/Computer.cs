@@ -14,9 +14,10 @@ namespace BangazonScrumptiousJellyfish.Models
         [Display(Name = "Date Purchased")]
         public DateTime DatePurchased { get; set; }
 
+
         [Required]
-        [Display(Name = "Date Commissioned")]
-        public DateTime DateCommissioned { get; set; }
+        [Display(Name = "Date Decommissioned")]
+        public DateTime DateDecommissioned { get; set; }
 
         [Required]
         public bool Working { get; set; }
@@ -27,5 +28,6 @@ namespace BangazonScrumptiousJellyfish.Models
 
         [Required]
         public string Manufacturer { get; set; }
+
     }
 }

@@ -47,13 +47,42 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 IEnumerable<Department> department = await conn.QueryAsync<Department>(sql);
 
                 return View(department);
+
             }
         }
 
-        // GET: Department/Details/5
-        public ActionResult Details(int id)
+
+        //GET: Department/5
+        public async Task<IActionResult> Details(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                select d.DepartmentId, d.DepartmentName,d.ExpenseBudget, e.EmployeeId, e.FirstName, e.LastName
+                from Department d
+                join Employee e on e.DepartmentId = d.DepartmentId
+                WHERE d.DepartmentId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                Dictionary<int, Department> departmentDictionary = new Dictionary<int, Department>();
+                var list = conn.Query<Department, Employee, Department>(sql, (department, employee) =>
+                {
+                    Department dep;
+                    if (!departmentDictionary.TryGetValue(department.DepartmentId, out dep))
+                    {
+                        dep = department;
+                        dep.Employees = new List<Employee>();
+                        departmentDictionary.Add(dep.DepartmentId, dep);
+                    }
+                    dep.Employees.Add(employee);
+                    return dep;
+                }, splitOn: "DepartmentId,EmployeeId").Distinct().First();
+                return View(list);
+            }
         }
 
         // GET: Department/Create
