@@ -133,6 +133,74 @@ namespace BangazonScrumptiousJellyfish.Controllers
             }
         }
 
+
+        // delete
+
+
+
+
+        public async Task<IActionResult> DeleteConfirm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                SELECT
+                    e.Id,
+                    e.Name,
+                    e.Language
+                FROM Exercise e
+                WHERE e.Id = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                Exercise exercise = await conn.QueryFirstAsync<Exercise>(sql);
+
+                if (exercise == null) return NotFound();
+
+                return View(exercise);
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+
+            string sql = $@"DELETE FROM Exercise WHERE Id = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                int rowsAffected = await conn.ExecuteAsync(sql);
+                if (rowsAffected > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                throw new Exception("No rows affected");
+            }
+        }
+
+
+
+
+
+        // delete
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // GET: TrainingProgram/Delete/5
         public ActionResult Delete(int id)
         {
