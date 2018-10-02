@@ -128,6 +128,9 @@ namespace BangazonScrumptiousJellyfish.Controllers
         {
 
             string sql = $@"DELETE FROM Computer WHERE ComputerId = {id}";
+            string sql2 = $@"DELETE FROM EmployeeComputer WHERE ComputerId = {id}";
+
+
 
             using (IDbConnection conn = Connection)
             {
@@ -140,10 +143,5 @@ namespace BangazonScrumptiousJellyfish.Controllers
             }
         }
 
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+        }
     }
-}
