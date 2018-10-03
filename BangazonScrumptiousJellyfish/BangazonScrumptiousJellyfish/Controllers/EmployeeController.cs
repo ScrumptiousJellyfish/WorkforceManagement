@@ -112,7 +112,18 @@ namespace BangazonScrumptiousJellyfish.Controllers
         {
             if (ModelState.IsValid)
             {
+
+    //            string sql2 = $@"
+				//IF(OBJECT_ID('dbo.FK_Department','F') IS NOT NULL)
+    //            BEGIN
+    //            ALTER TABLE dbo.Employee
+    //            DROP Constraint FK_Department
+    //            END";
+                
+
                 string sql = $@"
+                   
+            
                     INSERT INTO Employee
                         ( FirstName, LastName, Email, Supervisor, DepartmentId )
                         VALUES
@@ -123,9 +134,17 @@ namespace BangazonScrumptiousJellyfish.Controllers
                             ,'{employee.DepartmentId}'
                         )
                     ";
+    //            string sql3 = $@"
+    //            ALTER TABLE dbo.Employee
+				//ADD constraint [FK_Department]
+				//FOREIGN KEY (DepartmentId) REFERENCES Department(DepartmentId)";
+
                 using (IDbConnection conn = Connection)
                 {
+                    //int rowsAffected = await conn.ExecuteAsync(sql2);
                     int rowsAffected = await conn.ExecuteAsync(sql);
+                    //int rowsAffected3 = await conn.ExecuteAsync(sql3);
+
                     if (rowsAffected > 0)
                     {
                         return RedirectToAction(nameof(Index));

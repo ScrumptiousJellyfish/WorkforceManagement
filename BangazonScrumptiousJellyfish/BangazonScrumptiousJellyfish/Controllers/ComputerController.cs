@@ -126,7 +126,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            if ( id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -142,14 +142,20 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 {
                     return RedirectToAction(nameof(Index));
                 }
+
                 throw new Exception("No rows affected");
-            
-            
-            
-            
+
+
+
+
             }
         }
-               
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 
         }
     }
+
+}
