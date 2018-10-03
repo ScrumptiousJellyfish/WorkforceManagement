@@ -191,6 +191,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     e.EmployeeId,
                     e.FirstName,
                     e.LastName,
+                    e.Email,
                     c.ComputerId,
                     c.ModelName,
                     d.DepartmentId,
@@ -226,28 +227,50 @@ namespace BangazonScrumptiousJellyfish.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(int id, EmployeeEditViewModel model)
         {
+            Console.WriteLine(id);
             if (id != model.Employee.EmployeeId)
             {
                 
                 return NotFound();
             }
+
+            ModelState.Remove("Employee.Department.DepartmentName");
+            ModelState.Remove("Employee.Department.ExpenseBudget");
+
             if (ModelState.IsValid)
             {
                 string sql = $@"
+                IF (OBJECT_ID('dbo.FK_Department', 'F') IS NOT NULL)
+                BEGIN
+                ALTER TABLE dbo.Employee DROP CONSTRAINT FK_Department
+                END";
+
+                string sql2 = $@"
                 UPDATE Employee
                 SET FirstName = '{model.Employee.FirstName}',
                     LastName = '{model.Employee.LastName}',
-                    DepartmentId = '{model.Employee.DepartmentId}'
-                WHERE EmployeeId = {id};
+                    Email = '{model.Employee.Email}',
+                    DepartmentId = '{model.Employee.Department.DepartmentId}'
+                WHERE EmployeeId = {id}";
 
-                UPDATE EmployeeComputer
-				SET ComputerId = '{model.Employee.Computer}'
-				WHERE EmployeeId = {id}";
+                //string sql3 = $@"
+                //            UPDATE EmployeeComputer
+                //    SET ComputerId = '{model.Employee.Computer.ComputerId}'
+                //WHERE EmployeeId = {id}";
+
+                string sql4 = $@"
+                ALTER TABLE Employee
+                ADD CONSTRAINT [FK_Department]
+                FOREIGN KEY (DepartmentId) REFERENCES Department(DepartmentId)";
 
                 using (IDbConnection conn = Connection)
+                using (IDbConnection conn2 = Connection)
+                using (IDbConnection conn4 = Connection)
                 {
                     int rowsAffected = await conn.ExecuteAsync(sql);
-                    if (rowsAffected > 0)
+                    int rowsAffected2 = await conn2.ExecuteAsync(sql2);
+                    int rowsAffected4 = await conn4.ExecuteAsync(sql4);
+                    if (/*rowsAffected > 0 &&*/ rowsAffected2 > 0 /*&& rowsAffected4 > 0*/)
                     {
                         return RedirectToAction(nameof(Index));
                     }

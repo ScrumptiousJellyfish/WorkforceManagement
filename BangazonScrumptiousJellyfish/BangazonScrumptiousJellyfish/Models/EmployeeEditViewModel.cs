@@ -14,13 +14,14 @@ namespace BangazonScrumptiousJellyfish.Models
 {
     public class EmployeeEditViewModel
     {
-        public Employee Employee { get; set; }
+        public Employee Employee { get; set; } = new Employee();
         
-        [Display(Name = "Current Computer")]
-        public List<SelectListItem> Computer { get; }
+        //[Display(Name = "Current Computer")]
+        //public List<SelectListItem> Computer { get; }
 
         [Display(Name = "Current Department")]
         public List<SelectListItem> Department { get; }
+
 
         private readonly IConfiguration _config;
 
@@ -38,30 +39,24 @@ namespace BangazonScrumptiousJellyfish.Models
         {
             _config = config;
 
-            string sql = $@"SELECT ComputerId, ModelName FROM Computer";
-
-            using (IDbConnection conn = Connection)
-            {
-                List<Computer> computer = (conn.Query<Computer>(sql)).ToList();
-
-                this.Computer = computer
-                    .Select(li => new SelectListItem
-                    {
-                        Text = li.ModelName,
-                        Value = li.ComputerId.ToString()
-                    }).ToList();
-            }
-            this.Computer.Insert(0, new SelectListItem
-            {
-                Text = "Choose Computer...",
-                Value = "0"
-            });
+            //string sql = $@"SELECT ComputerId, ModelName FROM Computer";
 
             string sql2 = $@"SELECT DepartmentId, DepartmentName FROM Department";
 
-            using (IDbConnection conn = Connection)
+
+            //using (IDbConnection conn = Connection)
+            using (IDbConnection conn2 = Connection)
             {
-                List<Department> department = (conn.Query<Department>(sql2)).ToList();
+                //List<Computer> computer = (conn.Query<Computer>(sql)).ToList();
+
+                //this.Computer = computer
+                //    .Select(li => new SelectListItem
+                //    {
+                //        Text = li.ModelName,
+                //        Value = li.ComputerId.ToString()
+                //    }).ToList();
+
+                List<Department> department = (conn2.Query<Department>(sql2)).ToList();
 
                 this.Department = department
                     .Select(li => new SelectListItem
@@ -70,6 +65,12 @@ namespace BangazonScrumptiousJellyfish.Models
                         Value = li.DepartmentId.ToString()
                     }).ToList();
             }
+            //this.Computer.Insert(0, new SelectListItem
+            //{
+            //    Text = "Choose Computer...",
+            //    Value = "0"
+            //});
+
             this.Department.Insert(0, new SelectListItem
             {
                 Text = "Choose Department...",
