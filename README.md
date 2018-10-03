@@ -17,3 +17,13 @@
 2. Open the sql file by using (Ctrl + O) then navigating to the project folder and select BangazonDatabaseFinal.sql.
 
 3. Execute the query. No errors should occur.
+
+## Connecting The Database To The Code
+
+1. make an appsettings.json file inside ```\WorkforceManagement\BangazonScrumptiousJellyfish\BangazonScrumptiousJellyfish```
+
+2. copy and paste the contents of templateappsettings.json to appsettings.json and follow the directions in the comments
+
+3. your dbconnection is found when opening ssms
+
+4. your dbname is what you specified when you created a new database
