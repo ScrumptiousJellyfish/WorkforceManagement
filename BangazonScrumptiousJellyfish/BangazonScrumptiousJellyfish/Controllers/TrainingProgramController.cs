@@ -47,16 +47,15 @@ namespace BangazonScrumptiousJellyfish.Controllers
         // GET: TrainingProgram/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
             string sql = $@"SELECT tp.*, e.*
                             FROM TrainingProgram tp
-                            JOIN EmployeeTraining et ON et.TrainingProgramId = tp.TrainingProgramId
-                            JOIN Employee e ON e.EmployeeId = et.EmployeeId
+                            LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.TrainingProgramId
+                            LEFT JOIN Employee e ON e.EmployeeId = et.EmployeeId
                             WHERE tp.TrainingProgramId = {id}";
-            Dictionary<int, TrainingProgram> programs = new Dictionary<int, TrainingProgram>();
             using (IDbConnection conn = Connection)
             {
                 TrainingProgram programInstance = new TrainingProgram();
@@ -67,7 +66,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
                         programInstance = program;
                         employeeList.Add(employee);
 
-                        
+
                         return program;
                     },
                     splitOn: "employeeId"
