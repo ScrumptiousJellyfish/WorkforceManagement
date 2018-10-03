@@ -49,8 +49,9 @@
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new {  id=item.TrainingProgramId }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Details", "Details", new { id = item.TrainingProgramId }) |
+                @Html.ActionLink("Delete", "DeleteConfirm", new { id = item.TrainingProgramId })
+                @*<a asp-action="DeleteConfirm" asp-route-id="@item.TrainingProgramId">Delete</a>*@
             </td>
         </tr>
 }
