@@ -41,6 +41,6 @@ namespace BangazonScrumptiousJellyfish.Models
 
         public Computer Computer { get; set; }
 
-        public List<TrainingProgram> TrainingPrograms { get; set; }
+        public List<TrainingProgram> TrainingPrograms { get; set; } = new List<TrainingProgram>();
     }
 }

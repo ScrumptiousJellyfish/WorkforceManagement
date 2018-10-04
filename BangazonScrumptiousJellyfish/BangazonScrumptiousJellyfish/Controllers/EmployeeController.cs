@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Dapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class EmployeeController : Controller
@@ -196,6 +198,11 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     c.ModelName,
                     d.DepartmentId,
                     d.DepartmentName,
+                    t.TrainingProgramId,
+                    t.ProgramName,
+                    et.EmployeeTrainingId,
+                    et.EmployeeId,
+                    et.TrainingProgramId,
                     ec.EmployeeComputerId,
                     ec.EmployeeId,
                     ec.ComputerId
@@ -203,20 +210,27 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 JOIN Department d on d.DepartmentId = e.DepartmentId
                 JOIN EmployeeComputer ec on e.EmployeeId = ec.EmployeeId
                 JOIN Computer c on ec.ComputerId = c.ComputerId
+                JOIN EmployeeTraining et ON e.EmployeeId = et.EmployeeId
+                JOIN TrainingProgram t ON t.TrainingProgramId = et.TrainingProgramId
                 WHERE e.EmployeeId = {id}";
 
             using (IDbConnection conn = Connection)
             {
                 EmployeeEditViewModel model = new EmployeeEditViewModel(_config);
 
-                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, Employee>(sql,
-                    (employee, computer, department) =>
+                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, TrainingProgram, Employee>(sql,
+                    (employee, computer, department, trainingProgram) =>
                     {
                         employee.Department = department;
                         employee.Computer = computer;
+                        employee.TrainingPrograms.Add(trainingProgram);
+                        //foreach(var program in trainingProgram)
+                        //{
+                        //    employee.TrainingPrograms.Add(program);
+                        //}
                         return employee;
 
-                    }, splitOn: "ComputerId, DepartmentId"
+                    }, splitOn: "ComputerId, DepartmentId, TrainingProgramId, EmployeeTrainingId, EmployeeComputerId"
                     )).Distinct().First();
                 return View(model);
             }
@@ -236,14 +250,19 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
             ModelState.Remove("Employee.Department.DepartmentName");
             ModelState.Remove("Employee.Department.ExpenseBudget");
+            ModelState.Remove("Employee.Computer.DatePurchased");
+            ModelState.Remove("Employee.Computer.DateDecommissioned");
+            ModelState.Remove("Employee.Computer.Working");
+            ModelState.Remove("Employee.Computer.ModelName");
+            ModelState.Remove("Employee.Computer.Manufacturer");
+            ModelState.Remove("Employee.TrainingProgram.ProgamName");
+            ModelState.Remove("Employee.TrainingProgram.StartDate");
+            ModelState.Remove("Employee.TrainingProgram.EndDate");
+            ModelState.Remove("Employee.TrainingProgram.MaxAttendees");
 
             if (ModelState.IsValid)
             {
-                string sql = $@"
-                IF (OBJECT_ID('dbo.FK_Department', 'F') IS NOT NULL)
-                BEGIN
-                ALTER TABLE dbo.Employee DROP CONSTRAINT FK_Department
-                END";
+                
 
                 string sql2 = $@"
                 UPDATE Employee
@@ -253,24 +272,42 @@ namespace BangazonScrumptiousJellyfish.Controllers
                     DepartmentId = '{model.Employee.Department.DepartmentId}'
                 WHERE EmployeeId = {id}";
 
-                //string sql3 = $@"
-                //            UPDATE EmployeeComputer
-                //    SET ComputerId = '{model.Employee.Computer.ComputerId}'
-                //WHERE EmployeeId = {id}";
+                string sql3 = $@"
+                UPDATE EmployeeComputer
+                    SET ComputerId = '{model.Employee.Computer.ComputerId}'
+                WHERE EmployeeId = {id}";
 
-                string sql4 = $@"
-                ALTER TABLE Employee
-                ADD CONSTRAINT [FK_Department]
-                FOREIGN KEY (DepartmentId) REFERENCES Department(DepartmentId)";
-
-                using (IDbConnection conn = Connection)
-                using (IDbConnection conn2 = Connection)
-                using (IDbConnection conn4 = Connection)
+                //foreach   
+                string sql4 = "";
+                 foreach(string program in model.TPCodes)
                 {
-                    int rowsAffected = await conn.ExecuteAsync(sql);
+                    sql4 =
+                        $@"
+                        INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+                            VALUES(  
+                                {program},
+                                {id})";
+                        using (IDbConnection conn4 = Connection)
+                    {
+                        int rowsAffected4 = await conn4.ExecuteAsync(sql4);
+                        if (rowsAffected4 > 0 )
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                        throw new Exception("No rows affected");
+
+                    }
+                }
+
+
+
+                using (IDbConnection conn2 = Connection)
+                using (IDbConnection conn3 = Connection)
+                {
+
                     int rowsAffected2 = await conn2.ExecuteAsync(sql2);
-                    int rowsAffected4 = await conn4.ExecuteAsync(sql4);
-                    if (/*rowsAffected > 0 &&*/ rowsAffected2 > 0 /*&& rowsAffected4 > 0*/)
+                    int rowsAffected3 = await conn3.ExecuteAsync(sql3);
+                    if (rowsAffected2 > 0 && rowsAffected3 > 0)
                     {
                         return RedirectToAction(nameof(Index));
                     }
