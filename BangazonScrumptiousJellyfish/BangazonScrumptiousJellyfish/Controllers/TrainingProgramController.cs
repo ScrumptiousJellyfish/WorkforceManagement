@@ -217,50 +217,5 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 throw new Exception("No rows affected");
             }
         }
-
-
-
-
-
-
-
-
-        // delete
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // GET: TrainingProgram/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: TrainingProgram/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add delete logic here
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

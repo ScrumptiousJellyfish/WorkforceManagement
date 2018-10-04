@@ -48,7 +48,23 @@
 
     <form asp-action="DeleteConfirmed">
         <input type="hidden" asp-for="TrainingProgramId" />
-        <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Index">Back to List</a>
+
+        @if (Model.StartDate.Date <= DateTime.Today)
+        {
+        <div>
+            <input disabled type="submit" value="Delete" class="btn btn-default" />
+            <p><b>Uh oh! Since <u>@Html.DisplayFor(model => model.ProgramName)</u> is currently in progress or is already complete, you are not able to delete this program.</b></p>
+            <a asp-action="Index">Back to List</a>
+        </div>
+        }
+        else
+        {
+            <div>
+                <input type="submit" value="Delete" class="btn btn-default" />
+                <br />
+                <a asp-action="Index">Back to List</a>
+            </div>
+        }
+
     </form>
 </div>
