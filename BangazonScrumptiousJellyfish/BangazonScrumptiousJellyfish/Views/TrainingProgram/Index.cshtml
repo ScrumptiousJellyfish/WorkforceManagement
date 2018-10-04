@@ -48,10 +48,9 @@
                 @Html.DisplayFor(modelItem => item.MaximumAttendees)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Edit", "Edit", new {  id=item.TrainingProgramId  }) |
                 @Html.ActionLink("Details", "Details", new { id = item.TrainingProgramId }) |
                 @Html.ActionLink("Delete", "DeleteConfirm", new { id = item.TrainingProgramId })
-                @*<a asp-action="DeleteConfirm" asp-route-id="@item.TrainingProgramId">Delete</a>*@
             </td>
         </tr>
 }
