@@ -85,7 +85,7 @@ namespace BangazonScrumptiousJellyfish.Controllers
         // POST: TrainingProgram/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind ("TrainingProgramId, ProgramName, Descrip, StartDate, EndDate, MaximumAttendees")] TrainingProgram trainingprogram)
+        public async Task<IActionResult> Create([Bind("TrainingProgramId, ProgramName, Descrip, StartDate, EndDate, MaximumAttendees")] TrainingProgram trainingprogram)
         {
             if (ModelState.IsValid)
             {
@@ -168,26 +168,88 @@ namespace BangazonScrumptiousJellyfish.Controllers
 
         }
 
-        // GET: TrainingProgram/Delete/5
-        public ActionResult Delete(int id)
+
+        // delete
+
+        //public async Task<IActionResult> DeleteConfirm(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    string sql = $@"
+        //        SELECT
+        //            tp.TrainingProgramId,
+        //            tp.ProgramName,
+        //            tp.Descrip,
+        //            tp.StartDate,
+        //            tp.EndDate,
+        //            tp.MaximumAttendees
+        //        FROM TrainingProgram tp
+        //        WHERE tp.TrainingProgramId = {id}";
+
+        //    using (IDbConnection conn = Connection)
+        //    {
+        //        TrainingProgram trainingprogram = await conn.QueryFirstAsync<TrainingProgram>(sql);
+
+        //        if (trainingprogram == null)
+        //        {
+        //            return NotFound();
+        //        }
+        //        return View(trainingprogram);
+        //    }
+        //}
+
+
+        public async Task<IActionResult> DeleteConfirm(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            string sql = $@"SELECT tp.TrainingProgramId, tp.ProgramName, tp.Descrip, tp.StartDate, tp.EndDate, tp.MaximumAttendees, et.EmployeeTrainingId, et.TrainingProgramId, et.EmployeeId, e.EmployeeId, e.FirstName, e.LastName, e.Supervisor, e.Email
+                            FROM TrainingProgram tp
+                            LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.TrainingProgramId
+                            LEFT JOIN Employee e ON e.EmployeeId = et.EmployeeId
+                            WHERE tp.TrainingProgramId = {id}";
+            using (IDbConnection conn = Connection)
+            {
+                TrainingProgram programInstance = new TrainingProgram();
+                List<Employee> employeeList = new List<Employee>();
+                var newQuery = await conn.QueryAsync<TrainingProgram, Employee, TrainingProgram>(sql,
+                    (program, employee) =>
+                    {
+                        programInstance = program;
+                        employeeList.Add(employee);
+
+
+                        return program;
+                    },
+                    splitOn: "employeeId"
+                    );
+                programInstance.Employees = employeeList;
+                return View(programInstance);
+            }
         }
 
-        // POST: TrainingProgram/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(int TrainingProgramId)
         {
-            try
-            {
-                // TODO: Add delete logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            string sql = $@"DELETE FROM TrainingProgram WHERE TrainingProgramId = {TrainingProgramId};
+                            DELETE FROM EmployeeTraining WHERE TrainingProgramId = {TrainingProgramId}
+                         ";
+
+            using (IDbConnection conn = Connection)
             {
-                return View();
+                int rowsAffected = await conn.ExecuteAsync(sql);
+                if (rowsAffected > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                throw new Exception("No rows affected");
             }
         }
     }
