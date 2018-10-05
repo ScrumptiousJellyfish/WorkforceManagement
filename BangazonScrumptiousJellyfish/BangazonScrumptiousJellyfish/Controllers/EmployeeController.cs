@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Dapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace BangazonScrumptiousJellyfish.Controllers
 {
     public class EmployeeController : Controller
@@ -177,26 +179,149 @@ namespace BangazonScrumptiousJellyfish.Controllers
                 return View();
             }
         }
-        //// GET: Employee/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
+
+        // GET: Employee/Edit/5
+        public async Task<ActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            string sql = $@"
+                SELECT
+                    e.EmployeeId,
+                    e.FirstName,
+                    e.LastName,
+                    e.Email,
+                    c.ComputerId,
+                    c.ModelName,
+                    d.DepartmentId,
+                    d.DepartmentName,
+                    t.TrainingProgramId,
+                    t.ProgramName,
+                    et.EmployeeTrainingId,
+                    et.EmployeeId,
+                    et.TrainingProgramId,
+                    ec.EmployeeComputerId,
+                    ec.EmployeeId,
+                    ec.ComputerId
+                FROM Employee e
+                JOIN Department d on d.DepartmentId = e.DepartmentId
+                JOIN EmployeeComputer ec on e.EmployeeId = ec.EmployeeId
+                JOIN Computer c on ec.ComputerId = c.ComputerId
+                JOIN EmployeeTraining et ON e.EmployeeId = et.EmployeeId
+                JOIN TrainingProgram t ON t.TrainingProgramId = et.TrainingProgramId
+                WHERE e.EmployeeId = {id}";
+
+            using (IDbConnection conn = Connection)
+            {
+                EmployeeEditViewModel model = new EmployeeEditViewModel(_config);
+
+                model.Employee = (await conn.QueryAsync<Employee, Computer, Department, TrainingProgram, Employee>(sql,
+                    (employee, computer, department, trainingProgram) =>
+                    {
+                        employee.Department = department;
+                        employee.Computer = computer;
+                        employee.TrainingPrograms.Add(trainingProgram);
+                        //foreach(var program in trainingProgram)
+                        //{
+                        //    employee.TrainingPrograms.Add(program);
+                        //}
+                        return employee;
+
+                    }, splitOn: "ComputerId, DepartmentId, TrainingProgramId, EmployeeTrainingId, EmployeeComputerId"
+                    )).Distinct().First();
+                return View(model);
+            }
+
+        }
         // POST: Employee/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, EmployeeEditViewModel model)
         {
-            try
+            Console.WriteLine(id);
+            if (id != model.Employee.EmployeeId)
             {
-                // TODO: Add update logic here
-                return RedirectToAction(nameof(Index));
+                
+                return NotFound();
             }
-            catch
+
+            ModelState.Remove("Employee.Department.DepartmentName");
+            ModelState.Remove("Employee.Department.ExpenseBudget");
+            ModelState.Remove("Employee.Computer.DatePurchased");
+            ModelState.Remove("Employee.Computer.DateDecommissioned");
+            ModelState.Remove("Employee.Computer.Working");
+            ModelState.Remove("Employee.Computer.ModelName");
+            ModelState.Remove("Employee.Computer.Manufacturer");
+            ModelState.Remove("Employee.TrainingProgram.ProgamName");
+            ModelState.Remove("Employee.TrainingProgram.StartDate");
+            ModelState.Remove("Employee.TrainingProgram.EndDate");
+            ModelState.Remove("Employee.TrainingProgram.MaxAttendees");
+
+            if (ModelState.IsValid)
             {
-                return View();
+                
+
+                string sql2 = $@"
+                UPDATE Employee
+                SET FirstName = '{model.Employee.FirstName}',
+                    LastName = '{model.Employee.LastName}',
+                    Email = '{model.Employee.Email}',
+                    DepartmentId = '{model.Employee.Department.DepartmentId}'
+                WHERE EmployeeId = {id}";
+
+                string sql3 = $@"
+                UPDATE EmployeeComputer
+                    SET ComputerId = '{model.Employee.Computer.ComputerId}'
+                WHERE EmployeeId = {id}";
+
+                //foreach   
+                string sql4 = "";
+                 foreach(string program in model.TPCodes)
+                {
+                    sql4 =
+                        $@"
+                        INSERT INTO EmployeeTraining(TrainingProgramId,EmployeeId)
+                            VALUES(  
+                                {program},
+                                {id})";
+                        using (IDbConnection conn4 = Connection)
+                    {
+                        int rowsAffected4 = await conn4.ExecuteAsync(sql4);
+                        if (rowsAffected4 > 0 )
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                        throw new Exception("No rows affected");
+
+                    }
+                }
+
+
+
+                using (IDbConnection conn2 = Connection)
+                using (IDbConnection conn3 = Connection)
+                {
+
+                    int rowsAffected2 = await conn2.ExecuteAsync(sql2);
+                    int rowsAffected3 = await conn3.ExecuteAsync(sql3);
+                    if (rowsAffected2 > 0 && rowsAffected3 > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    throw new Exception("No rows affected");
+                }
+            }
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status406NotAcceptable);
             }
         }
+
+    
+
         // GET: Employee/Delete/5
         public ActionResult Delete(int id)
         {
