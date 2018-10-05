@@ -17,6 +17,12 @@
             @Html.DisplayFor(model => model.ProgramName)
         </dd>
         <dt>
+            @Html.DisplayNameFor(model => model.Descrip)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Descrip)
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
         <dd>
@@ -35,9 +41,9 @@
             @Html.DisplayFor(model => model.MaximumAttendees)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Employees)
-        </dt>
-        @foreach(var item in Model.Employees)
+                @Html.DisplayNameFor(model => model.Employees)
+            </dt>
+        @foreach (var item in Model.Employees)
         {
             <dd>
                 @Html.DisplayFor(modelItem => item.FullName)
@@ -47,6 +53,6 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Edit", "Edit", new {  id = Model.TrainingProgramId  }) |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=INSERT_DATABASE_CONNECTION_HERE;Database=INSERT_DATABASE_NAME_HERE;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
